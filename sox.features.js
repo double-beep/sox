@@ -5,8 +5,7 @@
     moveBounty: function() {
       // Description: For moving bounty to the top
 
-      $('.bounty-notification').insertAfter('.question .fw-wrap');
-      $('.bounty-link.bounty').closest('ul').insertAfter('.question .fw-wrap');
+      $('.bounty-notification.post-layout--right').insertAfter('.question .js-post-notices').css('margin-bottom', '15px');
     },
 
     dragBounty: function() {
@@ -35,7 +34,7 @@
     },
 
     markEmployees: function () {
-      // Description: Adds an Stack Overflow logo next to users that *ARE* a Stack Overflow Employee
+      // Description: Adds a Stack Exchange logo next to users that *ARE* Stack Exchange employees
 
       const anchors = [...document.querySelectorAll('.comment a, .deleted-answer-info a, .employee-name a, .user-details a, .question-summary .started a')].filter(el => {
         return !el.parentElement.classList.contains('user-gravatar32') && el.href.contains('/users/');
@@ -168,13 +167,12 @@
       // Description: For displaying username next to avatar on topbar
 
       const name = sox.user.name;
-      const $span = $('<span/>', {
+      $('<span/>', {
         class: 'reputation links-container',
         style: $('.top-bar').css('background-color') == 'rgb(250, 250, 251)' ? 'color: #535a60; padding-right: 12px; font-size: 13px;' : 'color: white; padding-right: 12px; font-size: 13px;',
         title: name,
         text: name,
-      });
-      $span.insertBefore('.top-bar .gravatar-wrapper-24');
+      }).insertBefore('.top-bar .gravatar-wrapper-24');
     },
 
     colorAnswerer: function() {
@@ -332,7 +330,7 @@
       }
 
       function addOptionsToDialog() {
-        $('#currentValues').html(' ');
+        document.getElementById('currentValues').innerHTML = ' ';
         const options = getOptions();
         options.forEach(opt => {
           const [[name, text]] = Object.entries(opt);
@@ -436,8 +434,8 @@
       });
 
       $(document).on('click', '#dialogEditReasons #submitUpdate', () => { //Click handler to update the array with custom value
-        const name = $('#displayReason').val();
-        const text = $('#actualReason').val();
+        const name = document.getElementById('displayReason').value;
+        const text = document.getElementById('actualReason').value;
 
         if (!name || !text) {
           alert('Please enter something in both the textboxes!');
@@ -448,7 +446,8 @@
           saveOptions(options);
 
           addOptionsToDialog(); //display the items again (update them)
-          $('#displayReason, #actualReason').val('');
+          document.getElementById('displayReason').value = '';
+          document.getElementById('actualReason').value = '';
         }
       });
 
@@ -599,7 +598,6 @@
 
       function expandLinks() {
         const isQuestionLink = /\/(q|questions)\//;
-        const FILTER_QUESTION_TITLE = '!)5IW-5QufDkXACxq_MT8aYkZRhm9';
 
         $('.post-text a:not(.expand-post-sox), .comment-copy a:not(.expand-post-sox)').each(function() {
           const href = this.href.replace(/https?:\/\//, '').replace(/www\./, '');
@@ -614,7 +612,7 @@
               endpoint: 'questions',
               ids: questionID,
               sitename,
-              filter: FILTER_QUESTION_TITLE,
+              filter: '!)5IW-5QufDkXACxq_MT8aYkZRhm9',
               featureId: 'parseCrossSiteLinks',
               cacheDuration: 10, // Cache for 10 minutes
             }, items => {
@@ -631,22 +629,20 @@
     confirmNavigateAway: function() {
       // Description: For adding a 'are you ure you want to go away' confirmation on pages where you have started writing something
 
-      if (window.location.href.indexOf('questions/') >= 0) {
-        $(window).bind('beforeunload', () => {
-          const textarea = document.querySelector('.comment-form textarea');
-          if (textarea && textarea.value) {
-            return 'Do you really want to navigate away? Anything you have written will be lost!';
-          }
-          return;
-        });
-      }
+      $(window).bind('beforeunload', () => {
+        const textarea = document.querySelector('.comment-form textarea');
+        if (textarea && textarea.value) {
+          return 'Do you really want to navigate away? Anything you have written will be lost!';
+        }
+        return;
+      });
     },
 
     sortByBountyAmount: function() {
       // Description: For adding some buttons to sort bounty's by size
 
       // Do nothing unless there is at least one bounty on the page
-      if (!document.getElementsByClassName('bounty-indicator').length) return;
+      if (!document.getElementsByClassName('bounty-indicator')) return;
 
       [...document.getElementsByClassName('question-summary')].forEach(summary => {
         const indicator = summary.querySelector('.bounty-indicator');
@@ -688,16 +684,16 @@
       }
 
       function addHotText() {
-        if (document.getElementsByClassName('sox-hot').length) return;
-        $(document.getElementById('question-header')).prepend(getHotDiv());
+        if ($('.sox-hot').length) return;
+        $($('#question-header')).prepend(getHotDiv());
       }
 
       const sitename = sox.site.currentApiParameter;
 
-      if (sox.location.on('/questions')) {
+      if (sox.location.on('/questions/')) {
         const postId = window.location.pathname.split('/')[2];
         apiCall(postId, sitename);
-      } else if ($('.question-summary').length) {
+      } else if ($('.question-summary')) {
         $('.question-summary').each(function() {
           // Check if .question-summary has an id attribute - SO Teams posts (at the top of the page, if any) don't!
           if ($(this).attr('id')) {
@@ -774,8 +770,7 @@
             hour -= 12;
           }
 
-          if (hour === 0)
-            hour += 12;
+          if (hour === 0) hour += 12;
         }
 
         const newTimestamp = (new Date()).getFullYear() == date.getFullYear() ? month + ' ' + date.getDate() + ' at ' + hour + ':' + minute + dayTime : month + ' ' + date.getDate() + ' \'' + year + ' at ' + hour + ':' + minute + dayTime;
@@ -813,7 +808,6 @@
 
       const sitename = sox.site.currentApiParameter;
       const WHITESPACES = '&nbsp;&nbsp;&nbsp;';
-      const COMMENT_SCORE_FILTER = '!)5IW-5QufDkXACxq_MT8bhYD9b.m';
 
       function addLabelsAndHandlers() {
         $('.history-table td b a[href*="#comment"]').each(function() {
@@ -829,7 +823,7 @@
             endpoint: 'comments',
             ids: this.id,
             sitename,
-            filter: COMMENT_SCORE_FILTER,
+            filter: '!)5IW-5QufDkXACxq_MT8bhYD9b.m',
             useCache: false, // Single ID, so no point
           }, items => {
             this.innerHTML = WHITESPACES + items[0].score;
@@ -858,7 +852,6 @@
       }
 
       const tagsForQuestionIDs = {};
-      const QUESTION_TAGS_FILTER = '!)8aDT8Opwq-vdo8';
       const questionIDs = [];
 
       const answers = [...document.getElementsByClassName('question-summary')].filter(q => /answer-id/.test(q.id));
@@ -875,7 +868,7 @@
         endpoint: 'questions',
         ids: questionIDs,
         sitename: sox.site.currentApiParameter,
-        filter: QUESTION_TAGS_FILTER,
+        filter: '!)8aDT8Opwq-vdo8',
         limit: 60,
         sort: 'creation',
         featureId: 'answerTagsSearch',
@@ -1019,7 +1012,6 @@
         metaName = sitename.replace('stackexchange','meta');
       }
 
-      const FILTER_QUESTION_TITLE_LINK = '!BHMIbze0EQ*ved8LyoO6rNk25qGESy';
       const $dialog = $('<div/>', {
         id: 'metaNewQuestionAlertDialog',
         'class': 'topbar-dialog dno new-topbar',
@@ -1069,7 +1061,7 @@
         'right': $('.-container').outerWidth() - $diamond.parent().position().left - $diamond.outerWidth(),
       });
 
-      if ($('#metaNewQuestionAlertButton').length) $('.js-topbar-dialog-corral').append($dialog);
+      if (document.getElementById('metaNewQuestionAlertButton')) $('.js-topbar-dialog-corral').append($dialog);
 
       $(document).mouseup(e => {
         if (!$dialog.is(e.target) &&
@@ -1089,7 +1081,7 @@
       sox.helpers.getFromAPI({
         endpoint: 'questions',
         sitename: metaName,
-        filter: FILTER_QUESTION_TITLE_LINK,
+        filter: '!BHMIbze0EQ*ved8LyoO6rNk25qGESy',
         sort: 'activity',
         limit: 5,
         featureId: 'metaNewQuestionAlert',
@@ -1157,7 +1149,6 @@
 
       // For use in dataset, used for hideCertainQuestions feature compatability
       const QUESTION_STATE_KEY = 'soxQuestionState';
-      const FILTER_QUESTION_CLOSURE_NOTICE = '!)Ei)3K*irDvFA)l92Lld3zD9Mu9KMQ59-bgpVw7D9ngv5zEt3';
       const NOTICE_REGEX = /\[(duplicate|closed|migrated|on hold)\]$/;
 
       function addLabels() {
@@ -1188,7 +1179,7 @@
           endpoint: 'questions',
           ids: questions.map(q => q.id),
           sitename: sox.site.currentApiParameter,
-          filter: FILTER_QUESTION_CLOSURE_NOTICE,
+          filter: '!)Ei)3K*irDvFA)l92Lld3zD9Mu9KMQ59-bgpVw7D9ngv5zEt3',
           featureId: 'standOutDupeCloseMigrated',
           cacheDuration: 10, // Cache for 10 minutes
         }, items => {
@@ -1301,12 +1292,12 @@
 
       function startSBS(toAppend) {
         //variables to reduce DOM searches
-        const wmdinput = $('#wmd-input' + toAppend);
-        const wmdpreview = $('#wmd-preview' + toAppend);
-        const posteditor = $('#post-editor' + toAppend);
-        const draftsaved = $('#draft-saved' + toAppend);
-        const draftdiscarded = $('#draft-discarded' + toAppend);
-        const editcommentdiv = $('#edit-comment' + toAppend).parent().parent(); //edit comment main parent div has no class or ID
+        const wmdinput = document.getElementById('wmd-input' + toAppend);
+        const wmdpreview = document.getElementById('wmd-preview' + toAppend);
+        const posteditor = document.getElementById('post-editor' + toAppend);
+        const draftsaved = document.getElementById('draft-saved' + toAppend);
+        const draftdiscarded = document.getElementById('draft-discarded' + toAppend);
+        const editcommentdiv = document.getElementById('edit-comment' + toAppend).parentElement.parentElement; //edit comment main parent div has no class or ID
 
         $('#wmd-button-bar' + toAppend).toggleClass('sbs-on');
 
@@ -1324,7 +1315,7 @@
         if (toAppend.length > 0) { //options specific to making edits on existing questions/answers
           posteditor.find('.hide-preview').toggleClass('sbs-on'); //needed to stop the tag box from being 'on top of' the textarea blocking text from being entering
           editcommentdiv.toggleClass('sbs-on edit-comment');
-        } else if (window.location.pathname.indexOf('questions/ask') > -1) { //extra CSS for 'ask' page
+        } else if (sox.location.on('/questions/ask')) { //extra CSS for 'ask' page
           wmdpreview.toggleClass('sbs-newq');
           draftsaved.toggleClass('sbs-newq');
           draftdiscarded.toggleClass('sbs-newq');
@@ -1341,8 +1332,8 @@
           }
         }
         if (wmdpreview.hasClass('sbs-on')) { //sbs was toggled on
-          $('#sidebar').addClass('sbs-on');
-          $('#content').addClass('sbs-on');
+          document.getElementById('sidebar').classList.add('sbs-on');
+          document.getElementById('content').classList.add('sbs-on');
           $('.tag-editor').parent().parent().removeAttr('style'); //remove style from both div style='position:relative'
           $('.tag-editor').parent().parent().parent().removeAttr('style'); //remove style from both div style='position:relative'
 
@@ -1362,9 +1353,9 @@
           if (!$('.question').find('.wmd-preview.sbs-on').length && !$('.answer').find('.wmd-preview.sbs-on').length) {
             $('.votecell').removeClass('sbs-on');
 
-            if (!($('#wmd-preview').hasClass('sbs-on'))) { //sbs is off for everything
-              $('#sidebar').removeClass('sbs-on');
-              $('#content').removeClass('sbs-on');
+            if (!document.getElementById('wmd-preview').classList.contains('sbs-on')) { //sbs is off for everything
+              document.getElementById('sidebar').classList.remove('sbs-on');
+              document.getElementById('content').classList.remove('sbs-on');
             }
           }
 
@@ -1409,7 +1400,7 @@
         }, 1000);
       }
 
-      if (window.location.pathname.indexOf('questions/ask') < 0) { //not posting a new question
+      if (!sox.location.on('questions/ask')) { //not posting a new question
         //get question and answer IDs for keeping track of the event listeners
         //answers have anchor tags before them of the form <a name="#">, where # is the answer ID
         const anchorList = $('#answers > a');
@@ -1645,10 +1636,10 @@
           // https://github.com/soscripted/sox/issues/205 -- check link's location is to same site, eg if on SU, don't allow on M.SU
           // http://stackoverflow.com/a/4815665/3541881
           if (url &&
-              $('<a>').prop('href', url).prop('hostname') == location.hostname &&
               !url.includes('#comment') &&
               !url.includes('/edit/') && // https://github.com/soscripted/sox/issues/281
               !url.includes('/tagged/') &&
+              !url.includes('web.archive.org') &&
               getIdFromUrl(url) && // getIdFromUrl(url) makes sure it won't fail later on
               !$(this).prev().is('.expand-post-sox')) {
             $(this).before('<a class="expander-arrow-small-hide expand-post-sox" style="border-bottom:0"></a>');
@@ -1669,9 +1660,21 @@
           $(this).addClass('expander-arrow-small-show');
           const $that = $(this);
           const id = getIdFromUrl($(this).next().attr('href'));
-          $.get(location.protocol + '//' + sox.site.url + '/posts/' + id + '/body', d => {
-            const div = '<div class="linkedPostsInline-loaded-body-sox">' + d + '</div>';
-            $that.next().after(div);
+          var url = $(this).next().attr('href');
+          if (!url.match(/https?:\/\//)) url = 'https://' + url;
+          sox.helpers.getFromAPI({
+            endpoint: 'posts',
+            ids: id,
+            sitename: sox.helpers.getSiteNameFromLink(url),
+            filter: '!)qFc_3CbvFS40DqE0ROu',
+            featureId: 'linkedPostsInline',
+            cacheDuration: 60, // Cache for 60 minutes
+          }, results => {
+            if (results.length) {
+              $that.next().after('<div class="linkedPostsInline-loaded-body-sox"><div style="text-align:center">' + results[0].title + '</div><br>' + results[0].body + '</div>');
+            } else {
+              $that.next().after('<div class="linkedPostsInline-loaded-body-sox"><strong>Post was not found through the API. It may have been deleted</3></strong>');
+            }
           });
         }
       });
@@ -1801,7 +1804,7 @@
         $column.append($link).appendTo($row);
       });
 
-      if (count > 0 && !$('#sox-top-answers').length) {
+      if (count > 0 && !document.getElementById('sox-top-answers')) {
         $('#answers div.answer:first').before($topAnswers);
         $table.css('width', count * 100 + 'px');
       }
@@ -1975,7 +1978,6 @@
       }
 
       function getIdsAndAddDetails(postAuthors) {
-        const FILTER_USER_LASTSEEN_TYPE = '!*MxL2H2Vp3iPIKLu';
 
         $('.user-details a[href^="/users"]').each(function() {
 
@@ -1995,7 +1997,7 @@
           endpoint: 'users',
           ids: Object.keys(postAuthors),
           sitename: sox.site.currentApiParameter,
-          filter: FILTER_USER_LASTSEEN_TYPE,
+          filter: '!*MxL2H2Vp3iPIKLu',
           sort: 'creation',
           featureId: 'quickAuthorInfo',
         }, items => {
@@ -2082,7 +2084,7 @@
         // the user clicks 'more hot questions', because the questions are *already* on
         // the page before the button is clicked, but just hidden!
 
-        if (WORDS_TO_BLOCK) {
+        if (!!WORDS_TO_BLOCK) {
           if (createRegex(WORDS_TO_BLOCK).test(this.innerText)) $(this).parent().addClass('sox-hot-network-question-filter-hide');
         }
 
@@ -2117,7 +2119,7 @@
 
       function checkAndAddReminder() {
         if (!sox.user.loggedIn && !sox.location.on('winterbash')) {
-          if (!$('#loggedInReminder').length) $('.container').append(div);
+          if (!document.getElementById('loggedInReminder')) $('.container').append(div);
         } else {
           $('#loggedInReminder').remove();
         }
@@ -2352,6 +2354,7 @@
           $(this).effect('highlight', {
             color: 'white',
           }, 3000);
+          console.log("Code copied to clipboard!");
         } catch (e) {
           sox.info('Browser doesn\'t support execComand for copyCode feature');
         }
@@ -2426,13 +2429,12 @@
         const $anchor = $('.summary h2 a');
         if (!$anchor.length) return;
         const postId = sox.helpers.getIDFromAnchor($anchor[0]);
-        const QUESTION_STATE_FILTER = '!-MOiNm40B3fle5H6oLVI3nx6UQo(vNstn';
 
         sox.helpers.getFromAPI({
           endpoint: 'questions',
           ids: postId,
           sitename: sox.site.currentApiParameter,
-          filter: QUESTION_STATE_FILTER,
+          filter: '!-MOiNm40B3fle5H6oLVI3nx6UQo(vNstn',
           sort: 'creation',
           useCache: false, // Single ID, so no point
         }, items => {
@@ -2571,7 +2573,7 @@
     hideHowToAskWhenZoomed: function() {
       // Description: Hides the 'How to ask/format/tag' yellow boxes that appear when asking a question whilst zoomed in
 
-      const target = document.getElementById('question-form');
+      const target = $('#question-form');
       sox.helpers.observe(target, '.js-help-pointer', el => {
         if ($(el).text().match(/(How to Ask)|(How to Format)|(How to Tag)/gi)) {
           $(el).remove();
@@ -2744,7 +2746,7 @@
             modalAttributes.header = `SOX: Linked Image <a class='sox-openImagesAsModals-sourceLink' target='_blank' rel='noopener noreferrer' href='${img.src}'>source</a>`;
             const $modal = sox.helpers.createModal(modalAttributes);
             $modal.find('.sox-custom-dialog-content').html(`<img width='100%' height='100%' src='${img.src}' />`);
-            if (!document.getElementById('#sox-linked-image-modal')) $('body').append($modal);
+            if (!document.getElementById('sox-linked-image-modal')) $('body').append($modal);
           });
         });
       });
@@ -2753,7 +2755,6 @@
     addTagsToHNQs: function () {
       // Description: Show HNQ tags on hover in the sidebar
 
-      const FILTER_QUESTION_TAGS = '!)5IW-5Quf*cV5LToe(J0BjSBXW19';
       const PLACEHOLDER = 'fetching tags...';
 
       function insertTagsList(anchor) {
@@ -2776,7 +2777,7 @@
               endpoint: 'questions',
               ids: id,
               sitename,
-              filter: FILTER_QUESTION_TAGS,
+              filter: '!)5IW-5Quf*cV5LToe(J0BjSBXW19',
               useCache: false, // Single ID, so no point
             }, items => {
               el.dataset.tags = items[0].tags.join(', ');
