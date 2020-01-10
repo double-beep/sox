@@ -1639,12 +1639,8 @@
               !url.includes('#comment') &&
               !url.includes('/edit/') && // https://github.com/soscripted/sox/issues/281
               !url.includes('/tagged/') &&
-<<<<<<< HEAD
-              !url.includes('web.archive.org') &&
-=======
               !url.includes('web.archive.org') &&  // Make sure this isn't a Web Archive URL
               !url.includes('/c/') && // Make sure it's not a SO Teams post
->>>>>>> 32df620618c61e42341bf2cfb330b12bc33e030c
               getIdFromUrl(url) && // getIdFromUrl(url) makes sure it won't fail later on
               !$(this).prev().is('.expand-post-sox')) {
             $(this).before('<a class="expander-arrow-small-hide expand-post-sox" style="border-bottom:0"></a>');
@@ -1665,11 +1661,7 @@
           $(this).addClass('expander-arrow-small-show');
           const $that = $(this);
           const id = getIdFromUrl($(this).next().attr('href'));
-<<<<<<< HEAD
-          var url = $(this).next().attr('href');
-=======
           const url = $(this).next().attr('href');
->>>>>>> 32df620618c61e42341bf2cfb330b12bc33e030c
           if (!url.match(/https?:\/\//)) url = 'https://' + url;
           sox.helpers.getFromAPI({
             endpoint: 'posts',
@@ -2353,22 +2345,6 @@
       $(document).on('sox-new-review-post-appeared', addButton);
 
       $(document).on('click', '.sox-copyCodeButton', function() {
-<<<<<<< HEAD
-        try {
-          const copyCodeTextareas = document.getElementsByClassName('sox-copyCodeTextarea');
-          if (!copyCodeTextareas.length) $('body').append('<textarea class="sox-copyCodeTextarea">');
-
-          copyCodeTextareas[0].value = $(this).next('pre').text();
-          copyCodeTextareas[0].select();
-          document.execCommand('copy');
-          $(this).effect('highlight', {
-            color: 'white',
-          }, 3000);
-          console.log("Code copied to clipboard!");
-        } catch (e) {
-          sox.info('Browser doesn\'t support execComand for copyCode feature');
-        }
-=======
         const copyCodeTextareas = document.getElementsByClassName('sox-copyCodeTextarea');
         if (!copyCodeTextareas.length) $('body').append('<textarea class="sox-copyCodeTextarea">');
 
@@ -2379,7 +2355,6 @@
         $(this).effect('highlight', {
           color: 'white',
         }, 3000);
->>>>>>> 32df620618c61e42341bf2cfb330b12bc33e030c
       });
     },
 
