@@ -2825,7 +2825,7 @@
     copyCommentMarkdown: function () {
       // Description: Adds button to copy the markdown of a comment next to them
 
-      $('.comment-body').each(function () {
+      $('.comment-text').each(function () {
         const $comment = $(this);
         const $soxReplyLink = $comment.find('.soxReplyLink');
         const $copyBtn = sox.sprites.getSvg('copy', 'SOX: copy comment markdown', {
@@ -2833,7 +2833,7 @@
           display: 'none',
         });
 
-        const commentId = +$comment.parent().parent().attr('data-comment-id');
+        const commentId = +$comment.parent().attr('data-comment-id');
         $copyBtn.on('click', function () {
           sox.helpers.getFromAPI({
             endpoint: 'comments',
