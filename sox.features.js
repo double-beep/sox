@@ -37,7 +37,7 @@
       // Description: Adds a Stack Exchange logo next to users that *ARE* Stack Exchange employees
 
       const anchors = [...document.querySelectorAll('.comment a, .deleted-answer-info a, .employee-name a, .user-details a, .question-summary .started a')].filter(el => {
-        return !el.parentElement.classList.contains('user-gravatar32') && el.href.contains('/users/');
+        return !el.parentElement.classList.contains('user-gravatar32') && el.href && el.href.contains('/users/');
       });
       const ids = [];
 
@@ -491,9 +491,10 @@
         setTimeout(() => {
           // $(this).attr('href') is relative, so make it absolute
           const href = new URL($(this).attr('href'), window.location.href).href;
-          $inputEl.val(`[${title}](${href})`);
+          const textToCopy = `[${title}](${href})`;
+          $inputEl.val(textToCopy);
           $inputEl.select();
-          document.execCommand('copy'); // https://github.com/soscripted/sox/issues/177
+          GM_setClipboard(textToCopy); // https://github.com/soscripted/sox/issues/177
         }, 0);
       });
     },
@@ -1633,13 +1634,17 @@
         $('.post-text a, .comments .comment-copy a').each(function() {
           const url = $(this).attr('href');
 
-          // https://github.com/soscripted/sox/issues/205 -- check link's location is to same site, eg if on SU, don't allow on M.SU
           // http://stackoverflow.com/a/4815665/3541881
           if (url &&
               !url.includes('#comment') &&
               !url.includes('/edit/') && // https://github.com/soscripted/sox/issues/281
               !url.includes('/tagged/') &&
+<<<<<<< HEAD
               !url.includes('web.archive.org') &&
+=======
+              !url.includes('web.archive.org') &&  // Make sure this isn't a Web Archive URL
+              !url.includes('/c/') && // Make sure it's not a SO Teams post
+>>>>>>> 32df620618c61e42341bf2cfb330b12bc33e030c
               getIdFromUrl(url) && // getIdFromUrl(url) makes sure it won't fail later on
               !$(this).prev().is('.expand-post-sox')) {
             $(this).before('<a class="expander-arrow-small-hide expand-post-sox" style="border-bottom:0"></a>');
@@ -1660,7 +1665,11 @@
           $(this).addClass('expander-arrow-small-show');
           const $that = $(this);
           const id = getIdFromUrl($(this).next().attr('href'));
+<<<<<<< HEAD
           var url = $(this).next().attr('href');
+=======
+          const url = $(this).next().attr('href');
+>>>>>>> 32df620618c61e42341bf2cfb330b12bc33e030c
           if (!url.match(/https?:\/\//)) url = 'https://' + url;
           sox.helpers.getFromAPI({
             endpoint: 'posts',
@@ -2344,6 +2353,7 @@
       $(document).on('sox-new-review-post-appeared', addButton);
 
       $(document).on('click', '.sox-copyCodeButton', function() {
+<<<<<<< HEAD
         try {
           const copyCodeTextareas = document.getElementsByClassName('sox-copyCodeTextarea');
           if (!copyCodeTextareas.length) $('body').append('<textarea class="sox-copyCodeTextarea">');
@@ -2358,6 +2368,18 @@
         } catch (e) {
           sox.info('Browser doesn\'t support execComand for copyCode feature');
         }
+=======
+        const copyCodeTextareas = document.getElementsByClassName('sox-copyCodeTextarea');
+        if (!copyCodeTextareas.length) $('body').append('<textarea class="sox-copyCodeTextarea">');
+
+        const textToCopy = $(this).next('pre').text();
+        copyCodeTextareas[0].value = textToCopy;
+        copyCodeTextareas[0].select();
+        GM_setClipboard(textToCopy);
+        $(this).effect('highlight', {
+          color: 'white',
+        }, 3000);
+>>>>>>> 32df620618c61e42341bf2cfb330b12bc33e030c
       });
     },
 
@@ -2563,11 +2585,15 @@
     hideWelcomeBackMessage: function() {
       // Description: Hide the 'welcome back...don't forget to vote' message when visiting a site after a while
 
-      sox.helpers.observe(document.body, '#overlay-header', el => {
+      function removeMessage(el) {
+        if (!el) return;
         if ($(el).text().match(/welcome back/gi)) {
           $(el).remove();
         }
-      });
+      }
+
+      sox.helpers.observe(document.body, '#overlay-header', el => removeMessage(el));
+      removeMessage(document.getElementById('overlay-header'));
     },
 
     hideHowToAskWhenZoomed: function() {
@@ -2810,5 +2836,50 @@
       if (roomsContainer.classList.contains('sox-scrollChatRoomsList-sidebar')) return;
       roomsContainer.classList.add('sox-scrollChatRoomsList-sidebar');
     },
+
+    copyCommentMarkdown: function () {
+      // Description: Adds button to copy the markdown of a comment next to them
+
+      $('.comment-body').each(function () {
+        const $comment = $(this);
+        const $soxReplyLink = $comment.find('.soxReplyLink');
+        const $copyBtn = sox.sprites.getSvg('copy', 'SOX: copy comment markdown', {
+          cursor: 'pointer',
+          display: 'none',
+        });
+
+        const commentId = +$comment.parent().parent().attr('data-comment-id');
+        $copyBtn.on('click', function () {
+          sox.helpers.getFromAPI({
+            endpoint: 'comments',
+            ids: [commentId],
+            filter: '!*JxbB6N6w(LGV_JR',
+            sitename: sox.site.url,
+            featureId: 'copyCommentMarkdown',
+            cacheDuration: 10, // Cache for 10 minutes
+          }, items => {
+            if (items[0] && items[0].body_markdown) {
+              GM_setClipboard(items[0].body_markdown);
+              window.alert('Copied comment markdown to clipboard!');
+            } else {
+              window.alert('There was an error getting the comment markdown. Please raise an issue on GitHub!');
+              sox.error('copyCommentMarkdown: could not get markdown from API. Returned data for comment ID ' + commentId +' was', items);
+            }
+          });
+        });
+
+        if ($soxReplyLink.length) {
+          $soxReplyLink.before($copyBtn);
+        } else {
+          $comment.find('span').last().after($copyBtn);
+        }
+
+        $comment.hover(function () {
+          $copyBtn.show();
+        }, function () {
+          $copyBtn.hide();
+        });
+      });
+    }
   };
 })(window.sox = window.sox || {}, jQuery);
