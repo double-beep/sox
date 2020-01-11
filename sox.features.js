@@ -772,8 +772,7 @@
             hour -= 12;
           }
 
-          if (hour === 0)
-            hour += 12;
+          if (hour === 0) hour += 12;
         }
 
         const newTimestamp = (new Date()).getFullYear() == date.getFullYear() ? month + ' ' + date.getDate() + ' at ' + hour + ':' + minute + dayTime : month + ' ' + date.getDate() + ' \'' + year + ' at ' + hour + ':' + minute + dayTime;
@@ -1643,7 +1642,7 @@
               !url.includes('#comment') &&
               !url.includes('/edit/') && // https://github.com/soscripted/sox/issues/281
               !url.includes('/tagged/') &&
-              !url.includes('web.archive.org') &&  // Make sure this isn't a Web Archive URL
+              !url.includes('web.archive.org') && // Make sure this isn't a Web Archive URL
               !url.includes('/c/') && // Make sure it's not a SO Teams post
               getIdFromUrl(url) && // getIdFromUrl(url) makes sure it won't fail later on
               !$(this).prev().is('.expand-post-sox')) {
@@ -2296,7 +2295,7 @@
         const $doc = $(d);
         let total = 0;
 
-        $doc.find('#content .grid.bt .fs-subheading').each(() => total += +$(this).text());
+        $doc.find('#content .grid.bt .fs-subheading').each(() => { total += +$(this).text() });
 
         const $lastReviewRow = $('#content .grid.bt').last();
 
