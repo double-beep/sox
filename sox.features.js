@@ -600,7 +600,6 @@
 
       function expandLinks() {
         const isQuestionLink = /\/(q|questions)\//;
-        const FILTER_QUESTION_TITLE = '!)5IW-5QufDkXACxq_MT8aYkZRhm9';
 
         $('.post-text a:not(.expand-post-sox), .comment-copy a:not(.expand-post-sox)').each(function() {
           const href = this.href.replace(/https?:\/\//, '').replace(/www\./, '');
@@ -615,7 +614,7 @@
               endpoint: 'questions',
               ids: questionID,
               sitename,
-              filter: FILTER_QUESTION_TITLE,
+              filter: '!)5IW-5QufDkXACxq_MT8aYkZRhm9',
               featureId: 'parseCrossSiteLinks',
               cacheDuration: 10, // Cache for 10 minutes
             }, items => {
@@ -1018,7 +1017,6 @@
         metaName = sitename.replace('stackexchange','meta');
       }
 
-      const FILTER_QUESTION_TITLE_LINK = '!BHMIbze0EQ*ved8LyoO6rNk25qGESy';
       const $dialog = $('<div/>', {
         id: 'metaNewQuestionAlertDialog',
         'class': 'topbar-dialog dno new-topbar',
@@ -1088,7 +1086,7 @@
       sox.helpers.getFromAPI({
         endpoint: 'questions',
         sitename: metaName,
-        filter: FILTER_QUESTION_TITLE_LINK,
+        filter: '!BHMIbze0EQ*ved8LyoO6rNk25qGESy',
         sort: 'activity',
         limit: 5,
         featureId: 'metaNewQuestionAlert',
@@ -1156,7 +1154,6 @@
 
       // For use in dataset, used for hideCertainQuestions feature compatability
       const QUESTION_STATE_KEY = 'soxQuestionState';
-      const FILTER_QUESTION_CLOSURE_NOTICE = '!)Ei)3K*irDvFA)l92Lld3zD9Mu9KMQ59-bgpVw7D9ngv5zEt3';
       const NOTICE_REGEX = /\[(duplicate|closed|migrated|on hold)\]$/;
 
       function addLabels() {
@@ -1187,7 +1184,7 @@
           endpoint: 'questions',
           ids: questions.map(q => q.id),
           sitename: sox.site.currentApiParameter,
-          filter: FILTER_QUESTION_CLOSURE_NOTICE,
+          filter: '!)Ei)3K*irDvFA)l92Lld3zD9Mu9KMQ59-bgpVw7D9ngv5zEt3',
           featureId: 'standOutDupeCloseMigrated',
           cacheDuration: 10, // Cache for 10 minutes
         }, items => {
@@ -1986,7 +1983,6 @@
       }
 
       function getIdsAndAddDetails(postAuthors) {
-        const FILTER_USER_LASTSEEN_TYPE = '!*MxL2H2Vp3iPIKLu';
 
         $('.user-details a[href^="/users"]').each(function() {
 
@@ -2006,7 +2002,7 @@
           endpoint: 'users',
           ids: Object.keys(postAuthors),
           sitename: sox.site.currentApiParameter,
-          filter: FILTER_USER_LASTSEEN_TYPE,
+          filter: '!*MxL2H2Vp3iPIKLu',
           sort: 'creation',
           featureId: 'quickAuthorInfo',
         }, items => {
@@ -2765,7 +2761,6 @@
     addTagsToHNQs: function () {
       // Description: Show HNQ tags on hover in the sidebar
 
-      const FILTER_QUESTION_TAGS = '!)5IW-5Quf*cV5LToe(J0BjSBXW19';
       const PLACEHOLDER = 'fetching tags...';
 
       function insertTagsList(anchor) {
@@ -2788,7 +2783,7 @@
               endpoint: 'questions',
               ids: id,
               sitename,
-              filter: FILTER_QUESTION_TAGS,
+              filter: '!)5IW-5Quf*cV5LToe(J0BjSBXW19',
               useCache: false, // Single ID, so no point
             }, items => {
               el.dataset.tags = items[0].tags.join(', ');
