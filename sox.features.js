@@ -698,48 +698,51 @@
       }
 
       function addHotText() {
-        if (document.getElementsByClassName('sox-hot').length) return;
-        $(document.getElementById('question-header')).prepend(getHotDiv());
+        if (!$('.sox-hot').length) $(document.getElementById('question-header')).prepend(getHotDiv());
       }
 
       const sitename = sox.site.currentApiParameter;
 
-      if (sox.location.on('/questions')) {
-        const postId = window.location.pathname.split('/')[2];
-        apiCall(postId, sitename);
-      } else if ($('.question-summary').length) {
+      const ids = [];
+      if (sox.location.on('/questions/')) {
+        apiCall(sox.Stack.question.getQuestionId(), sitename);
+      } else if ($('.question-summary')) {
         $('.question-summary').each(function() {
-          // Check if .question-summary has an id attribute - SO Teams posts (at the top of the page, if any) don't!
-          if ($(this).attr('id')) {
-            var postID = $(this).attr('id').split('-')[2];
-            apiCall(postID, sitename, this);
+          if ($(this).attr('id')) { // Check if class has an id attribute - SO Teams posts (at the top of the page, if any) don't!
+            ids.push($(this).attr('id').split('-')[2]);
           }
         });
+        $.get(
+          `https://api.stackexchange.com/2.2/posts/${ids.join(';')}/revisions?site=${sitename}&key=${sox.info.apikey}&filter=!SWJaL3-zS*0y8dJU5_`,
+          function(results) {
+            for (let i = 0; i < Math.ceil(results.total / 100); i++) {
+              apiCall(ids.slice(i * 100, (i * 100) + 100), sitename, i + 1);
+            }
+          }
+        )
       }
 
-      function apiCall(postID, sitename, el) {
+      function apiCall(ids, sitename, page) {
         sox.helpers.getFromAPI({
           endpoint: 'posts',
           childEndpoint: 'revisions',
           sitename: sitename,
-          filter: '!5RC-)9_aw3mg*i)3*vUhU3Wfl',
-          ids: postID,
+          filter: '!*JxbFI2p1n-3dqNX',
+          ids: ids,
+          limit: 100,
+          page: page,
           featureId: 'isQuestionHot',
           cacheDuration: 60 * 8, // Cache for 8 hours
         }, results => {
           for (let i = 0; i < results.length; i++) {
             const result = results[i];
-            if (!result.comment // there's no comment, post was created
-              || result.comment.includes('<b>Post Closed</b> as &quot;') // post is closed
-              || result.comment.includes('<b>Removed from Hot Network Questions</b> by') // post has been removed from HNQ
+            if (!result.comment) continue;
+            if ((!result.comment.includes('<b>Post Closed</b> as &quot;') // post is not closed
+              || !result.comment.includes('<b>Removed from Hot Network Questions</b> by')) // post has not been removed from HNQ
+              && result.comment === '<b>Became Hot Network Question</b> ' // question is HNQ
+              && new Date().getTime() / 1000 - result.creation_date <= 259200 // question is at least 3 days old
             ) {
-              break;
-            }
-
-            if (result.comment === '<b>Became Hot Network Question</b> ' // question is HNQ
-              && new Date().getTime() / 1000 - result.creation_date <= 259200 // question is 3 days old
-            ) {
-              sox.location.on('/questions') ? addHotText() : $(el).find('.summary h3').prepend(getHotDiv('question-list'));
+              sox.location.on('/questions/') ? addHotText() : $('#question-summary-' + result.post_id).find('.summary h3').prepend(getHotDiv('question-list'))
             }
           }
         });
